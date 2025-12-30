@@ -1,4 +1,4 @@
-## How to Setup a Docker Windows Container and Github Desktop to use within the course.
+## Steps to Prepare of IA650
 
 1. Install Github Desktop --> https://desktop.github.com/download/
 
