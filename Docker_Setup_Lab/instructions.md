@@ -12,6 +12,6 @@
 
 4. Go to this site --> https://github.com/acloudsecninja/acsn-windows-docker-image
 
-5. Run the following instructions & commands within its README.md and it will create the docker windows imager you will use for this course.
+5. Run the following instructions & commands within its README.md and it will create the docker windows image you will use for this course.
 
 - acloudsecninja - Professor Weber
