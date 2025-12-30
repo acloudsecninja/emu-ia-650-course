@@ -1,7 +1,5 @@
 ## How to Setup a Docker Windows Container and Github Desktop to use within the course.
 
-* Video of Setup --> LINK TBD
-
 1. Install Github Desktop --> https://desktop.github.com/download/
 
 2. Install Docker Desktop --> https://docs.docker.com/desktop/setup/install/windows-install/
