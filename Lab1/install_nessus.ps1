@@ -15,8 +15,8 @@ if (-Not (Test-Path "C:\Temp")) {
     New-Item -Path "C:\" -Name "Temp" -ItemType Directory
 }
 
-# Download Nessus Essentials installer
-Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
+# Download Nessus Essentials installer using curl
+curl -o $installerPath $installerUrl
 
 # Start the installation
 Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait
