@@ -16,10 +16,17 @@ if (-Not (Test-Path "C:\Temp")) {
 }
 
 # Download Nessus Essentials installer using curl
-curl --request GET --url $installerUrl --output $installerPath
+& curl.exe --request GET --url $installerUrl --output $installerPath
 
 # Start the installation
 Start-Process -FilePath $installerPath -ArgumentList "/quiet" -Wait
 
+# Verify installation
+if (Test-Path "C:\Program Files\Tenable\Nessus" -or Test-Path "C:\Program Files\Nessus") {
+    Write-Host "Nessus Essentials has been installed successfully."
+} else {
+    Write-Host "Nessus Essentials installation failed or not found."
+}
+
 # Optionally, remove the installer after installation
-Remove-Item -Path $installerPath
+Remove-Item -Path $installerPath -ErrorAction SilentlyContinue
