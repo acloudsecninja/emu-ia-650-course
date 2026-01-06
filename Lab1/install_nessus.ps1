@@ -1,5 +1,7 @@
 # PowerShell script for installing Nessus Essentials
 
+# Do Not Use in Production. This is for testing only.
+
 # Function to check if a command has executed successfully
 function Check-Command {
     param (
