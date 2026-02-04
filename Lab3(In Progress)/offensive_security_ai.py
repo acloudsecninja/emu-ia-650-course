@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Offensive Security Testing with Hugging Face AI Models
-Author: Security Research Lab
+Author: Professor Weber
 Description: Python script for testing offensive security tactics using Hugging Face AI models
 """
 
