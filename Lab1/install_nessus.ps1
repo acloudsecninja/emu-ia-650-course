@@ -7,8 +7,8 @@
 
 
 # Define URL for Nessus Essentials installer
-// ## $installerUrl = 'https://www.tenable.com/downloads/api/v2/pages/nessus/files/Nessus-10.11.1-x64.msi'
-// ## $installerPath = "C:\Temp\Nessus-10.11.1-x64.msi"
+$installerUrl = 'https://www.tenable.com/downloads/api/v2/pages/nessus/files/Nessus-10.11.1-x64.msi'
+$installerPath = "C:\Temp\Nessus-10.11.1-x64.msi"
 
 # Create Temp directory if it doesn't exist
 if (-Not (Test-Path "C:\Temp")) {
@@ -19,7 +19,7 @@ if (-Not (Test-Path "C:\Temp")) {
 & curl.exe --request GET --url $installerUrl --output $installerPath
 
 # Start the installation
-// ## Start-Process -FilePath $installerPath -ArgumentList "/quiet" -Wait
+Start-Process -FilePath $installerPath -ArgumentList "/quiet" -Wait
 
 # Verify installation
 if (Test-Path "C:\Program Files\Tenable\Nessus" -or Test-Path "C:\Program Files\Nessus") {
