@@ -3,7 +3,7 @@
 # Do Not Use in Production. This is for testing only.
 
 ## You must run the following command in Powershell before excuting the following script or the script not work without it.
-### Set-ExecutionPolicy Unrestricted ###
+Set-ExecutionPolicy Unrestricted ###
 
 
 # Define URL for Nessus Essentials installer
