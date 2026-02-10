@@ -26,17 +26,6 @@ Install the required Python packages:
 pip install -r requirements.txt
 ```
 
-### Optional Tools
-For enhanced reconnaissance capabilities:
-```bash
-# Install nmap for comprehensive port scanning
-sudo apt update
-sudo apt install nmap
-
-# Install other security tools (optional)
-sudo apt install nikto dirbuster gobuster
-```
-
 ## 🛠️ Installation
 
 1. **Clone or download the lab files:**
