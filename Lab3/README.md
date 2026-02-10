@@ -1,8 +1,15 @@
 # Offensive Security Testing with Hugging Face AI Models
 
-This lab demonstrates how to use Hugging Face AI models for testing offensive security tactics on Ubuntu systems against Windows targets.
+## ⚠️ Safety and Ethics
+
+### Important Warnings
+- **Educational Purpose Only**: This tool is designed for educational and authorized security testing only
+- **Legal Compliance**: Only use on systems you own or have explicit permission to test
+- **Network Isolation**: Test in isolated lab environments
+- **Responsible Disclosure**: Report any discovered vulnerabilities responsibly
 
 ## 🚀 Overview
+This lab demonstrates how to use Hugging Face AI models for testing offensive security tactics on Ubuntu systems against Windows targets.
 
 The Python script leverages state-of-the-art AI models from Hugging Face to generate and test various offensive security techniques including:
 - Phishing email generation
@@ -39,10 +46,21 @@ pip install -r requirements.txt
    pip install -r requirements.txt
    ```
 
-3. **Verify installation:**
+3. **Install Additional Requirements on Ubuntu (Optional / or If Required and you must be Root):**
    ```bash
-   python offensive_security_ai.py --help
+   apt-get update
+   apt-get upgrade
+   apt install python3-pip
+   pip install -r requirements.txt
+   python3
    ```
+- Once you run Python3 you should get a new prompt which means python is installed and ready to use.
+
+4. **Verify installation:**
+   ```bash
+   python3 offensive_security_ai.py --help
+   ```
+- You should get an output of help commands which means the packages are installed and the python script is working correctly.
 
 ## 🎯 Usage
 
@@ -50,7 +68,7 @@ pip install -r requirements.txt
 
 Run the script with default settings:
 ```bash
-python offensive_security_ai.py
+python3 offensive_security_ai.py
 ```
 
 ### Advanced Usage
@@ -59,16 +77,16 @@ Customize the testing parameters:
 
 ```bash
 # Test specific attack type against a target
-python offensive_security_ai.py --target 192.168.1.100 --attack-type payload
+python3 offensive_security_ai.py --target UPDATE_WITH_TARGET_IP --attack-type payload
 
 # Use a different AI model
-python offensive_security_ai.py --model distilgpt2 --attack-type phishing
+python3 offensive_security_ai.py --model distilgpt2 --attack-type phishing
 
 # Perform comprehensive reconnaissance
-python offensive_security_ai.py --target 192.168.1.0/24 --scan-type comprehensive
+python3 offensive_security_ai.py --target UPDATE_WITH_TARGET_NETWORK/24 --scan-type comprehensive
 
 # Generate custom report
-python offensive_security_ai.py --output my_security_report.json
+python3 offensive_security_ai.py --output my_security_report.json
 ```
 
 ### Command Line Options
@@ -121,14 +139,6 @@ The script generates several outputs:
   }
 }
 ```
-
-## ⚠️ Safety and Ethics
-
-### Important Warnings
-- **Educational Purpose Only**: This tool is designed for educational and authorized security testing only
-- **Legal Compliance**: Only use on systems you own or have explicit permission to test
-- **Network Isolation**: Test in isolated lab environments
-- **Responsible Disclosure**: Report any discovered vulnerabilities responsibly
 
 ### Safety Features
 - Payload analysis without execution

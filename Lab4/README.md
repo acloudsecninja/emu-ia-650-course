@@ -1,5 +1,13 @@
 # Lab 4: Website Defacement Testing
 
+## ⚠️ Safety and Ethics
+
+### Important Warnings
+- **Educational Purpose Only**: This tool is designed for educational and authorized security testing only
+- **Legal Compliance**: Only use on systems you own or have explicit permission to test
+- **Network Isolation**: Test in isolated lab environments
+- **Responsible Disclosure**: Report any discovered vulnerabilities responsibly
+
 ## Overview
 This lab demonstrates website defacement testing techniques using Python on Kali Linux. The purpose is educational - to help students understand how attackers compromise and deface websites, and how to defend against such attacks.
 
@@ -178,15 +186,6 @@ Educational Purpose Only - IA-650 Course
 - Generate a comprehensive security report
 - Include risk assessments
 - Provide remediation recommendations
-
-## Legal and Ethical Considerations
-
-⚠️ **IMPORTANT**: This tool is for educational purposes only
-
-- Only test on systems you own or have explicit permission to test
-- Follow responsible disclosure practices
-- Document all findings professionally
-- Never use these techniques for malicious purposes
 
 ## Troubleshooting
 
