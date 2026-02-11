@@ -189,6 +189,9 @@ Choose from various Hugging Face models:
    
    # Install with user permissions
    pip install --user -r requirements.txt
+
+   # If you get an error about externally managed python environment
+   pip install --break-system-packages -r requirements.txt
    ```
 
 4. **Nmap Not Found**
@@ -219,10 +222,6 @@ After completing this lab, you will understand:
 ## 📄 License
 
 This educational material is provided for academic purposes. Please ensure compliance with your institution's policies and applicable laws when using security testing tools.
-
-## 🤝 Contributing
-
-This is a learning laboratory. Suggestions for improvements and additional features are welcome through proper academic channels.
 
 ---
 
