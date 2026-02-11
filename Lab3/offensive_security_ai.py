@@ -78,11 +78,37 @@ class OffensiveSecurityAI:
                 task = progress.add_task("Loading model and tokenizer...", total=None)
                 
                 logger.info(f"Loading model: {self.model_name}")
+                
+                # Memory optimization: use 8-bit quantization if available
+                try:
+                    from transformers import BitsAndBytesConfig
+                    quantization_config = BitsAndBytesConfig(
+                        load_in_8bit=True,
+                        llm_int8_threshold=6.0
+                    )
+                    use_quantization = True
+                except ImportError:
+                    quantization_config = None
+                    use_quantization = False
+                    logger.info("BitsAndBytesConfig not available, using standard loading")
+                
                 self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+                
+                # Load model with memory optimizations
+                model_kwargs = {
+                    "torch_dtype": torch.float16 if self.device == "cuda" else torch.float32,
+                    "low_cpu_mem_usage": True,
+                    "device_map": "auto" if self.device == "cuda" else None
+                }
+                
+                # Add quantization if available and using CUDA
+                if use_quantization and self.device == "cuda":
+                    model_kwargs["quantization_config"] = quantization_config
+                    logger.info("Using 8-bit quantization for memory efficiency")
+                
                 self.model = AutoModelForCausalLM.from_pretrained(
                     self.model_name,
-                    torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
-                    device_map="auto" if self.device == "cuda" else None
+                    **model_kwargs
                 )
                 
                 if self.device == "cpu":
@@ -92,15 +118,19 @@ class OffensiveSecurityAI:
                 if self.tokenizer.pad_token is None:
                     self.tokenizer.pad_token = self.tokenizer.eos_token
                 
+                # Reduce max_length for memory efficiency
+                max_length = 256 if "distilgpt2" in self.model_name.lower() or "gpt2" in self.model_name.lower() else 512
+                
                 self.generator = pipeline(
                     "text-generation",
                     model=self.model,
                     tokenizer=self.tokenizer,
                     device=0 if self.device == "cuda" else -1,
-                    max_length=512,
+                    max_length=max_length,
                     temperature=0.7,
                     do_sample=True,
-                    pad_token_id=self.tokenizer.eos_token_id
+                    pad_token_id=self.tokenizer.eos_token_id,
+                    truncation=True
                 )
                 
                 progress.update(task, description="Model loaded successfully!")

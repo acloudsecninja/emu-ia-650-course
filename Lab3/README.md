@@ -19,7 +19,7 @@ The Python script leverages state-of-the-art AI models from Hugging Face to gene
 - Lateral movement methods
 - Persistence mechanisms
 
-## 📋 Prerequisites
+## 📋 Prerequisites & 🎯 Usage
 
 ### System Requirements
 - Ubuntu 20.04+ (recommended)
@@ -62,16 +62,7 @@ pip install -r requirements.txt
    ```
 - You should get an output of help commands which means the packages are installed and the python script is working correctly.
 
-## 🎯 Usage
-
-### Basic Usage
-
-Run the script with default settings:
-```bash
-python3 offensive_security_ai.py
-```
-
-### Advanced Usage
+### Advanced Usage - Use if you have set your Target IP Address/Network Subnet
 
 Customize the testing parameters:
 
@@ -88,6 +79,14 @@ python3 offensive_security_ai.py --target UPDATE_WITH_TARGET_NETWORK/24 --scan-t
 # Generate custom report
 python3 offensive_security_ai.py --output my_security_report.json
 ```
+
+### Basic Usage - Only Run if you have set your Target IP Address/Network Subnet
+
+Run the script with default settings:
+```bash
+python3 offensive_security_ai.py
+```
+
 
 ### Command Line Options
 
