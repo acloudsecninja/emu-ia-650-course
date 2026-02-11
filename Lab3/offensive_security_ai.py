@@ -27,20 +27,30 @@ except ImportError as e:
     print("Please install requirements: pip install -r requirements.txt")
     sys.exit(1)
 
-# Configure logging
+# Configure logging with enhanced troubleshooting
+import logging.handlers
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.DEBUG,  # Changed to DEBUG for more detailed logging
+    format='%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
     handlers=[
         logging.FileHandler('offensive_security_ai.log'),
         logging.StreamHandler()
     ]
 )
 logger = logging.getLogger(__name__)
+
+# Add memory usage logging
+import psutil
+def log_memory_usage(stage: str):
+    """Log current memory usage for troubleshooting"""
+    process = psutil.Process()
+    memory_info = process.memory_info()
+    memory_mb = memory_info.rss / 1024 / 1024
+    logger.info(f"Memory usage at {stage}: {memory_mb:.2f} MB")
 console = Console()
 
 class OffensiveSecurityAI:
-    def __init__(self, model_name: str = "microsoft/DialoGPT-medium", device: str = "auto"):
+    def __init__(self, model_name: str = "gpt2", device: str = "auto"):
         """
         Initialize the Offensive Security AI testing framework
         
@@ -70,6 +80,10 @@ class OffensiveSecurityAI:
     def load_model(self):
         """Load the Hugging Face model and tokenizer"""
         try:
+            log_memory_usage("start_load_model")
+            logger.info(f"Starting model loading process")
+            logger.info(f"Model: {self.model_name}, Device: {self.device}")
+            
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
@@ -78,6 +92,7 @@ class OffensiveSecurityAI:
                 task = progress.add_task("Loading model and tokenizer...", total=None)
                 
                 logger.info(f"Loading model: {self.model_name}")
+                log_memory_usage("before_tokenizer")
                 
                 # Memory optimization: use 8-bit quantization if available
                 try:
@@ -87,14 +102,19 @@ class OffensiveSecurityAI:
                         llm_int8_threshold=6.0
                     )
                     use_quantization = True
+                    logger.info("8-bit quantization available")
                 except ImportError:
                     quantization_config = None
                     use_quantization = False
                     logger.info("BitsAndBytesConfig not available, using standard loading")
                 
+                logger.info("Loading tokenizer...")
                 self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+                log_memory_usage("after_tokenizer")
+                logger.info("Tokenizer loaded successfully")
                 
                 # Load model with memory optimizations
+                logger.info("Preparing model loading parameters...")
                 model_kwargs = {
                     "torch_dtype": torch.float16 if self.device == "cuda" else torch.float32,
                     "low_cpu_mem_usage": True,
@@ -106,20 +126,33 @@ class OffensiveSecurityAI:
                     model_kwargs["quantization_config"] = quantization_config
                     logger.info("Using 8-bit quantization for memory efficiency")
                 
+                logger.info("Loading model weights...")
+                log_memory_usage("before_model_load")
+                
                 self.model = AutoModelForCausalLM.from_pretrained(
                     self.model_name,
                     **model_kwargs
                 )
                 
+                log_memory_usage("after_model_load")
+                logger.info("Model weights loaded successfully")
+                
                 if self.device == "cpu":
+                    logger.info("Moving model to CPU...")
                     self.model = self.model.to(self.device)
+                    log_memory_usage("after_model_to_cpu")
                 
                 # Set padding token if not present
                 if self.tokenizer.pad_token is None:
                     self.tokenizer.pad_token = self.tokenizer.eos_token
+                    logger.info("Set padding token to EOS token")
                 
-                # Reduce max_length for memory efficiency
-                max_length = 256 if "distilgpt2" in self.model_name.lower() or "gpt2" in self.model_name.lower() else 512
+                # Reduce max_length for memory efficiency - using smallest for gpt2
+                max_length = 128  # Very small for gpt2 to minimize memory
+                logger.info(f"Setting max_length to {max_length} for memory efficiency")
+                
+                logger.info("Creating generation pipeline...")
+                log_memory_usage("before_pipeline")
                 
                 self.generator = pipeline(
                     "text-generation",
@@ -133,7 +166,9 @@ class OffensiveSecurityAI:
                     truncation=True
                 )
                 
+                log_memory_usage("after_pipeline")
                 progress.update(task, description="Model loaded successfully!")
+                logger.info("Model loading completed successfully")
                 
         except Exception as e:
             logger.error(f"Failed to load model: {e}")
@@ -355,7 +390,7 @@ class OffensiveSecurityAI:
 
 def main():
     parser = argparse.ArgumentParser(description="Offensive Security Testing with AI Models")
-    parser.add_argument("--model", default="microsoft/DialoGPT-medium", help="Hugging Face model name")
+    parser.add_argument("--model", default="gpt2", help="Hugging Face model name")
     parser.add_argument("--target", default="127.0.0.1", help="Target IP address")
     parser.add_argument("--attack-type", choices=["phishing", "payload", "recon", "privilege_escalation", "lateral_movement", "persistence"], 
                        default="payload", help="Type of attack to generate")

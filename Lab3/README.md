@@ -51,7 +51,7 @@ pip install -r requirements.txt
    apt-get update
    apt-get upgrade
    apt install python3-pip
-   pip install -r requirements.txt
+   pip install -r requirements.txt --break-system-packages
    python3
    ```
 - Once you run Python3 you should get a new prompt which means python is installed and ready to use.
