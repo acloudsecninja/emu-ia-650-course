@@ -6,7 +6,6 @@
 - **Educational Purpose Only**: This tool is designed for educational and authorized security testing only
 - **Legal Compliance**: Only use on systems you own or have explicit permission to test
 - **Network Isolation**: Test in isolated lab environments
-- **Responsible Disclosure**: Report any discovered vulnerabilities responsibly
 
 ## Overview
 This lab demonstrates website defacement testing techniques using Python on Kali Linux. The purpose is educational - to help students understand how attackers compromise and deface websites, and how to defend against such attacks.
