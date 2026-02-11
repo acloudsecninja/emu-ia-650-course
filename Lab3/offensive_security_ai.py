@@ -50,7 +50,7 @@ def log_memory_usage(stage: str):
 console = Console()
 
 class OffensiveSecurityAI:
-    def __init__(self, model_name: str = "gpt2", device: str = "auto"):
+    def __init__(self, model_name: str = "gpt2", device: str = "cpu"):
         """
         Initialize the Offensive Security AI testing framework
         
@@ -69,11 +69,23 @@ class OffensiveSecurityAI:
     def _determine_device(self, device: str) -> str:
         """Determine the best device for model inference"""
         if device == "auto":
-            if torch.cuda.is_available():
-                return "cuda"
-            elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-                return "mps"
-            else:
+            # Force CPU to avoid CUDA issues
+            logger.info("Auto device selection - forcing CPU to avoid CUDA compatibility issues")
+            return "cpu"
+        elif device == "cuda":
+            # Test CUDA availability and compatibility
+            try:
+                if torch.cuda.is_available():
+                    # Test CUDA with a simple operation
+                    test_tensor = torch.tensor([1.0]).cuda()
+                    _ = test_tensor + 1
+                    logger.info("CUDA test passed - using GPU")
+                    return "cuda"
+                else:
+                    logger.warning("CUDA not available - falling back to CPU")
+                    return "cpu"
+            except Exception as e:
+                logger.error(f"CUDA test failed: {e} - falling back to CPU")
                 return "cpu"
         return device
     
@@ -397,7 +409,7 @@ def main():
     parser.add_argument("--scan-type", choices=["basic", "comprehensive", "stealth"], 
                        default="basic", help="Type of reconnaissance scan")
     parser.add_argument("--output", default="security_test_report.json", help="Output report file")
-    parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto", help="Device to run model on")
+    parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="cpu", help="Device to run model on")
     
     args = parser.parse_args()
     

@@ -42,7 +42,7 @@ pip install -r requirements.txt
 
 2. **Install Python dependencies:**
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirements.txt --break-system-packages
    ```
 
 3. **Install Additional Requirements on Ubuntu (Optional / or If Required and you must be Root):**
@@ -50,7 +50,8 @@ pip install -r requirements.txt
    apt-get update
    apt-get upgrade
    apt install python3-pip
-   pip install -r requirements.txt --break-system-packages
+   pip install accelerate
+   pip install -r requirements.txt --user --break-system-packages
    python3
    ```
 - Once you run Python3 you should get a new prompt which means python is installed and ready to use.
@@ -91,12 +92,12 @@ python3 offensive_security_ai.py
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--model` | Hugging Face model name | `microsoft/DialoGPT-medium` |
+| `--model` | Hugging Face model name | `gpt2` |
 | `--target` | Target IP address | `127.0.0.1` |
 | `--attack-type` | Type of attack to generate | `payload` |
 | `--scan-type` | Type of reconnaissance scan | `basic` |
 | `--output` | Output report file | `security_test_report.json` |
-| `--device` | Device to run model on | `auto` |
+| `--device` | Device to run model on | `cpu` |
 
 ### Attack Types
 
@@ -148,15 +149,14 @@ The script generates several outputs:
 
 ### Model Selection
 Choose from various Hugging Face models:
-- `microsoft/DialoGPT-medium` (default, balanced)
+- `gpt2` (default, smallest, most memory efficient)
 - `distilgpt2` (lighter, faster)
-- `gpt2` (standard)
 - `gpt2-medium` (more capable)
 
 ### Device Optimization
-- `auto` - Automatically selects best available device
-- `cpu` - Force CPU usage
-- `cuda` - Use GPU acceleration (if available)
+- `cpu` - Force CPU usage (default, most stable)
+- `cuda` - Use GPU acceleration (if available and compatible)
+- `auto` - Automatically selects best available device (forces CPU to avoid CUDA issues)
 
 ## 🐛 Troubleshooting
 
@@ -171,16 +171,25 @@ Choose from various Hugging Face models:
    python offensive_security_ai.py --model distilgpt2
    ```
 
-2. **CUDA Out of Memory**
+2. **CUDA Out of Memory or CUDA Errors**
    ```bash
-   # Use CPU instead
+   # Use CPU instead (recommended)
    python offensive_security_ai.py --device cpu
    
    # Or use smaller model
-   python offensive_security_ai.py --model distilgpt2
+   python offensive_security_ai.py --model gpt2 --device cpu
+   ```
+   
+3. **CUDA Symbol Not Found / Segmentation Fault**
+   ```bash
+   # This is a CUDA compatibility issue - force CPU usage
+   python offensive_security_ai.py --device cpu
+   
+   # Or reinstall PyTorch CPU-only
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
    ```
 
-3. **Permission Denied**
+4. **Permission Denied**
    ```bash
    # Ensure proper permissions
    chmod +x offensive_security_ai.py
@@ -192,7 +201,7 @@ Choose from various Hugging Face models:
    pip install --break-system-packages -r requirements.txt
    ```
 
-4. **Nmap Not Found**
+5. **Nmap Not Found**
    ```bash
    # Install nmap
    sudo apt install nmap
