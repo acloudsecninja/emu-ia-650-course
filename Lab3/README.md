@@ -27,9 +27,14 @@ The Python script leverages state-of-the-art AI models from Hugging Face to gene
 - Internet connection (to download AI models)
 
 ### Dependencies
-Install the required Python packages:
+
+- Log into your WSL within Windows / Bash terminal
+
+- Install the required Python packages:
+
 ```bash
-pip install -r requirements.txt
+apt install python3-pip -y ## Need to Root
+pip install -r requirements.txt --break-system-packages ## Make sure you are in the right directory and not in root
 ```
 
 ## 🛠️ Installation
@@ -40,23 +45,7 @@ pip install -r requirements.txt
    cd Lab3
    ```
 
-2. **Install Python dependencies:**
-   ```bash
-   pip install -r requirements.txt --break-system-packages
-   ```
-
-3. **Install Additional Requirements on Ubuntu (Optional / or If Required and you must be Root):**
-   ```bash
-   apt-get update
-   apt-get upgrade
-   apt install python3-pip
-   pip install accelerate
-   pip install -r requirements.txt --user --break-system-packages
-   python3
-   ```
-- Once you run Python3 you should get a new prompt which means python is installed and ready to use.
-
-4. **Verify installation:**
+3. **Verify installation:**
    ```bash
    python3 offensive_security_ai.py --help
    ```
