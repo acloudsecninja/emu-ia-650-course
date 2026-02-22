@@ -30,7 +30,7 @@ This lab demonstrates website defacement testing techniques using Python on Kali
 sudo apt update && sudo apt upgrade -y
 
 # Install required Python packages
-pip3 install requests
+pip3 install requests --break-system-packages
 
 # Ensure script is executable
 chmod +x website_deface_test.py
@@ -50,6 +50,9 @@ sudo systemctl enable apache2
 sudo nano /var/www/html/login.php
 ```
 
+# Open up the web browser and navigate to on the ubuntu system to make sure it comes up http://127.0.0.1/login.php then you can start the attack in the basic usage section
+
+
 ### 3. Network Configuration
 Ensure both systems can communicate:
 ```bash
@@ -60,9 +63,9 @@ curl http://<ubuntu-ip>
 
 ## Usage
 
-### Basic Usage
+### Basic Usage - Run the Script when you are on the kali linux system which will hit the ubuntu system
 ```bash
-python3 website_deface_test.py <target-url>
+python3 website_deface_test.py <ubuntu-ip>
 ```
 
 ### Examples
@@ -70,7 +73,7 @@ python3 website_deface_test.py <target-url>
 # Test basic vulnerability scanning
 python3 website_deface_test.py http://192.168.1.100
 
-# Test with authentication
+# Test with authentication (Will not work in this example)
 python3 website_deface_test.py http://192.168.1.100 -u admin -p password
 
 # Save report to file
@@ -139,52 +142,6 @@ Educational Purpose Only - IA-650 Course
 </body>
 </html>
 ```
-
-## Defense Strategies
-
-### Prevention Techniques
-1. **Input Validation**
-   - Sanitize all user inputs
-   - Use whitelist validation
-   - Implement length limits
-
-2. **SQL Injection Protection**
-   - Use parameterized queries
-   - Implement prepared statements
-   - Use ORM frameworks
-
-3. **File Upload Security**
-   - Validate file types
-   - Scan for malware
-   - Store uploads outside web root
-
-4. **Access Control**
-   - Implement proper authentication
-   - Use principle of least privilege
-   - Regular access audits
-
-### Detection Methods
-1. **Web Application Firewalls (WAF)**
-2. **Intrusion Detection Systems (IDS)**
-3. **File integrity monitoring**
-4. **Regular security scanning**
-
-## Lab Exercises
-
-### Exercise 1: Vulnerability Identification
-- Run the script against a vulnerable test system
-- Document all found vulnerabilities
-- Research each vulnerability type
-
-### Exercise 2: Defense Implementation
-- Patch identified vulnerabilities
-- Re-run the script to verify fixes
-- Document the defense mechanisms
-
-### Exercise 3: Report Writing
-- Generate a comprehensive security report
-- Include risk assessments
-- Provide remediation recommendations
 
 ## Troubleshooting
 
