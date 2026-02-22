@@ -39,7 +39,7 @@ ip addr show
 1. Start your Kali Linux VM
 2. Install Python dependencies:
 ```bash
-pip3 install -r requirements.txt
+pip3 install -r requirements.txt --break-system-packages
 ```
 
 3. Verify connectivity to Ubuntu:
