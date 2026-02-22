@@ -50,9 +50,6 @@ sudo systemctl enable apache2
 sudo nano /var/www/html/login.php
 ```
 
-# Open up the web browser and navigate to on the ubuntu system to make sure it comes up http://127.0.0.1/login.php then you can start the attack in the basic usage section
-
-
 ### 3. Network Configuration
 Ensure both systems can communicate:
 ```bash
