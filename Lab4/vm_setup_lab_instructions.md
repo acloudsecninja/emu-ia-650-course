@@ -253,25 +253,6 @@ Document:
 
 ---
 
-## Analysis Questions
-
-1. **Vulnerability Analysis**
-   - What made the original code vulnerable?
-   - How could these vulnerabilities be discovered automatically?
-   - What are the business impacts of each vulnerability type?
-
-2. **Defense Analysis**
-   - Which defense mechanisms were most effective?
-   - What additional security measures would you recommend?
-   - How would you implement defense-in-depth?
-
-3. **Process Analysis**
-   - What steps in the testing process were most critical?
-   - How would this process differ in a real penetration test?
-   - What legal and ethical considerations apply?
-
----
-
 ## Bonus Challenges
 
 ### Challenge 1: Web Application Firewall
